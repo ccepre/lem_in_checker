@@ -67,8 +67,10 @@ class   Output_Checker() :
         return (0)
 
     def check_actions(self, actions = None) :
-        if (actions == None) :
-            actions = self.actions
+        actions = self.actions if actions == None else actions
+        if (actions == []) :
+            self.error_message = "There are no answer"
+            return (1)
         for i in range(len(self.actions)) :
             actions[i] = actions[i].replace("L", "", 1)
             actions[i] = actions[i].split(" L")
@@ -76,9 +78,6 @@ class   Output_Checker() :
                     [action.split("-", 1) for action in actions[i]])
             if (self.check_step(i, actions) == 1) :
                 self.error_message += "\nLine : '{}'".format(self.raw_actions[i])
-#               f = open("output_error", "a")
-#               f.write("\n".join(list(actions)))
-#               f.close()
                 return (1)
         if self.ants_arrived != self.map_parser.ants :
             self.error_message = "Wrong number of ants arrived : \nAnts arrived : {}\nMap ants : {}"\

@@ -71,7 +71,7 @@ class   Map_Exec() :
             return (1)
         elif (self.output == []) :
             self.error_message = "Error during execution of lem-in :\n"\
-                    + "lem-in returned nothing on stdout"
+                    + "lem-in returned nothing on stdout (maybe invalid map)"
             return (-1)
         return (0)
 
@@ -145,7 +145,8 @@ class   Gen_Executer() :
                             str(i), "")
                     break 
             else :
-               self.display_result(-1, -1, "Wrong split of the output", "")
+               self.display_result(-1, -1, output_checker.error_message, "")
+               return (1)
             steps = len(output_checker.actions)
             if map_parser.steps_required != None :
                 self.result.append(steps - map_parser.steps_required)

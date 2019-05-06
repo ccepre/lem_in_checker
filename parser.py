@@ -79,7 +79,7 @@ class   Map_Parser() :
         line = line.split("-")
         if len(line) < 2 :
             return (0)
-        for i in range(len(line)) :
+        for i in range(len(line) - 1) :
             name1 = "-".join(line[:i + 1])
             name2 = "-".join(line[i + 1:])
             room1 = self.find_room(name1)

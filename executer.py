@@ -54,6 +54,10 @@ class   Map_Exec() :
             self.error_message = "Error during map reading.\n" +\
                     "No file named '{}'".format(path_map)
             return (1)
+        except IsADirectoryError :
+            self.error_message = "Error during map reading.\n" +\
+                    "'{}' is a directory".format(path_map)
+            return (1)
         return (0)
 
     def exec_lem_in(self, exec_name = "./lem-in", path_map = "map") :
@@ -71,12 +75,12 @@ class   Map_Exec() :
             return (1)
         elif (self.output == []) :
             self.error_message = "Error during execution of lem-in :\n"\
-                    + "lem-in returned nothing on stdout (maybe invalid map)"
+                    + "lem-in returned nothing on stdout (probably invalid map)"
             return (-1)
         return (0)
 
 class   Gen_Executer() :
-    def __init__(self, nb_exec, gen_option = "--big-superposition", lim_diff = 5) :
+    def __init__(self, nb_exec, gen_option = "--big-superposition", lim_diff = 8) :
         self.nb_exec = nb_exec
         self.gen_option = gen_option
         self.lim_diff = lim_diff 
@@ -138,12 +142,18 @@ class   Gen_Executer() :
                 warning = "WARNING : the map has not been read entirely"
             output_checker = checker.Output_Checker(map_exec.output, map_parser)
             if (output_checker.split_output() != 1) :
+                if output_checker.check_map_output() == 1 :
+                    os.system("mv map map_error_" + str(i))
+                    self.display_result(-1, -1, output_checker.error_message +\
+                            "\nThe map has been registered has map_error_" +\
+                            str(i), "")
+                    continue 
                 if output_checker.check_actions() == 1 :
                     os.system("mv map map_error_" + str(i))
                     self.display_result(-1, -1, output_checker.error_message +\
                             "\nThe map has been registered has map_error_" +\
                             str(i), "")
-                    break 
+                    continue 
             else :
                self.display_result(-1, -1, output_checker.error_message, "")
                return (1)
@@ -164,7 +174,6 @@ class   Custom_Executer() :
         self.path = path
 
     def display_result(self, steps = -1, steps_required = -1, error_message = "") :
-        print("\n------- Map : {} ------".format(self.path))
         if (error_message == "") :
             print("Checker : ok")
             print("steps : " + str(steps))
@@ -175,10 +184,11 @@ class   Custom_Executer() :
         print("-"*len("------- Map : {} ------".format(self.path)))
 
     def execute_custom(self, path = "") :
-        self.path = self.path if path == "" else path
-        if (self.path == "") :
+        path = self.path if path == "" else path
+        if (path == "") :
             print("No path")
             return (1)
+        print("\n------- Map : {} ------".format(path))
         map_exec = Map_Exec()
         if (map_exec.read_custom_map(path_map = path)) :
             self.display_result(error_message = map_exec.error_message)
@@ -190,11 +200,9 @@ class   Custom_Executer() :
         map_parser = parser.Map_Parser(map_exec.map_gen)
         map_parser.parse_map()
         output_checker = checker.Output_Checker(map_exec.output, map_parser)
-        if (output_checker.split_output() or output_checker.check_actions()\
-                or output_checker.check_map_output()) :
+        if (output_checker.split_output() or output_checker.check_actions()) :
             self.display_result(error_message = output_checker.error_message)
         else :
             steps = len(output_checker.actions)
-            steps_required = map_parser.steps_required
-            self.display_result(steps, steps_required)
+            self.display_result(steps, map_parser.steps_required)
         return (0)

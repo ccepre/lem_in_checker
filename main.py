@@ -2,12 +2,13 @@
 # coding: utf-8
 
 import executer
+import subprocess
 
 def display_menu() :
     print("Select one of these options :")
     print("1 : Execute generator")
     print("2 : Execute custom map")
-    # print("3 : Execute tests")
+    print("3 : Execute all map in a repository")
 
 def ask_input(input_message, invalid_message, valid_arg) :
     while (1) :
@@ -53,15 +54,35 @@ def custom_option() :
         if (custom_exec.execute_custom(map_path) == 0) :
             break
 
+def repository_option() :
+    print("\n--------- Repository Execuer ---------")
+    while (1) :
+        repo_path = input("Give the repository path to execute.\nRepo_path : ")
+        try :
+            pipe = subprocess.Popen(["ls", repo_path],\
+                    stdout=subprocess.PIPE,\
+                    stderr=subprocess.PIPE,\
+                    universal_newlines=True)
+            output, error_message = pipe.communicate()
+            pipe.terminate()
+            break
+        except FileNotFoundError :
+            print("No repo '{}'".format(repo_path))
+    output = [repo_path + "/" + map_name for map_name in output.split("\n")\
+            if map_name != '']
+    for map_repo in output :
+        map_executer = executer.Custom_Executer(map_repo)
+        map_executer.execute_custom()
+
 if __name__ == "__main__" :
     display_menu()
     # valid_input = ["1", "2", "3"]
-    valid_input = ["1", "2"]
+    valid_input = ["1", "2", "3"]
     option = ask_input("Option : ",\
             "This option doesn't exist. Give an input between " + ", ".join(valid_input), valid_input)
     if (option == "1") :
         generator_option()
     if (option == "2") :
         custom_option()
-    # if (option == "3") :
-    #     tests_option()
+    if (option == "3") :
+        repository_option()

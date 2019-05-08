@@ -33,7 +33,7 @@ class   Output_Checker() :
                     return (1)
                 return (0)
             if i == 0 :
-                self.error_message = "Ant {} in room {} come frome nowhere (line : {})"\
+                self.error_message = "Ant '{}' in room '{}' come frome nowhere (line : {})"\
                         .format(action[0], action[1], nb_line)
         return (0)
 
@@ -52,12 +52,12 @@ class   Output_Checker() :
         room_error = [(key, value) for key, value in nb_occur_room.items()\
                 if value > 1 and key != self.map_parser.end.name]
         if len(ants_error) > 0 :
-            self.error_message = "Ant in multiple room (" + str(ants_error)\
-                    + "): line " + str(nb_line)
+            self.error_message = "Ant number '{}' is in {} rooms at the same time line {}."\
+                    .format(str(ants_error[0][0]), str(ants_error[0][1]), str(nb_line))
             return (1)
         if len(room_error) > 0 :
             self.error_message = "Multiple ants in a room (" + str(room_error)\
-                    + "): line " + str(nb_line)
+                    + ") line " + str(nb_line)
             return (1)
         if self.map_parser.end.name in nb_occur_room.keys() :
             self.ants_arrived += nb_occur_room[self.map_parser.end.name]
@@ -69,7 +69,7 @@ class   Output_Checker() :
     def check_actions(self, actions = None) :
         actions = self.actions if actions == None else actions
         if (actions == []) :
-            self.error_message = "There are no answer"
+            self.error_message = "There is no action to check"
             return (1)
         for i in range(len(self.actions)) :
             actions[i] = actions[i].replace("L", "", 1)

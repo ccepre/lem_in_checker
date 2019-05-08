@@ -110,6 +110,7 @@ class   Gen_Executer() :
         warning = "\033[93m"
         if (warning_message != "") :
             print(warning_message)
+        warning_message = ""
         if (error_message != "") :
             print(error_message)
         else :
@@ -156,7 +157,7 @@ class   Gen_Executer() :
                     continue 
             else :
                self.display_result(-1, -1, output_checker.error_message, "")
-               return (1)
+               continue
             steps = len(output_checker.actions)
             if map_parser.steps_required != None :
                 self.result.append(steps - map_parser.steps_required)
